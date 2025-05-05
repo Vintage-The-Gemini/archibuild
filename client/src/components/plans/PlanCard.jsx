@@ -1,7 +1,6 @@
 // client/src/components/plans/PlanCard.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { formatCurrency } from '../../utils';
 
 // Simple icons for the features
 const BedIcon = () => (
@@ -35,6 +34,15 @@ const HeartIcon = ({ filled }) => (
   </svg>
 );
 
+/**
+ * Format currency to KES with proper formatting
+ * @param {number} amount - The amount to format
+ * @returns {string} Formatted currency string
+ */
+const formatCurrency = (amount) => {
+  return `KES ${amount.toLocaleString()}`;
+};
+
 const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
   const {
     id,
@@ -49,6 +57,7 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
   
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -59,7 +68,11 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+    <div 
+      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Image container with overlay */}
       <div className="relative">
         <Link to={`/plans/${id}`} className="block relative h-64 overflow-hidden">
@@ -74,7 +87,7 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
           <img 
             src={imageError ? "/assets/images/placeholder-house.jpg" : (image || "/assets/images/placeholder-house.jpg")} 
             alt={name}
-            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100 hover:scale-105' : 'opacity-0'}`}
+            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'scale-105' : 'scale-100'}`}
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
@@ -95,7 +108,11 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
               ? 'text-red-500 bg-white/90 shadow-md' 
               : 'text-gray-100 bg-black/20 hover:bg-white/90 hover:text-gray-800'
           } transition-all duration-300 transform hover:scale-110`}
-          onClick={() => onToggleFavorite && onToggleFavorite(id)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleFavorite && onToggleFavorite(id);
+          }}
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
           <HeartIcon filled={isFavorite} />
@@ -119,7 +136,7 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
       {/* Content */}
       <div className="p-4">
         <Link to={`/plans/${id}`} className="block">
-          <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors mb-1">
+          <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors mb-1 truncate">
             {name}
           </h3>
         </Link>
@@ -142,6 +159,27 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
               <span>{squareFootage.toLocaleString()} sq ft</span>
             </div>
           </div>
+        </div>
+        
+        {/* Quick action buttons - visible on hover */}
+        <div className={`mt-4 flex space-x-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // Handle add to cart functionality
+              console.log('Adding to cart:', id);
+            }}
+            className="flex-1 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded transition-colors"
+          >
+            Add to Cart
+          </button>
+          <Link 
+            to={`/plans/${id}/customize`} 
+            className="flex-1 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-xs font-medium rounded text-center transition-colors"
+          >
+            Customize
+          </Link>
         </div>
       </div>
     </div>
