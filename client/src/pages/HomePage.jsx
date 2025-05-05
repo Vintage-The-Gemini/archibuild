@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+// client/src/pages/HomePage.jsx
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { formatCurrency } from '../utils/formatCurrency';
 
 // Icons
 const MagnifyingGlassIcon = () => (
@@ -10,6 +12,7 @@ const MagnifyingGlassIcon = () => (
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadedImages, setLoadedImages] = useState({});
   
   // Featured plans (would come from API in real implementation)
   const featuredPlans = [
@@ -21,7 +24,7 @@ const HomePage = () => {
       bathrooms: 3,
       squareFootage: 3200,
       price: 195000,
-      image: '/assets/images/plans/modern-villa.jpg'
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
     },
     {
       id: 2,
@@ -31,7 +34,7 @@ const HomePage = () => {
       bathrooms: 2.5,
       squareFootage: 2800,
       price: 165000,
-      image: '/assets/images/plans/coastal-retreat.jpg'
+      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
     },
     {
       id: 3,
@@ -41,20 +44,42 @@ const HomePage = () => {
       bathrooms: 4,
       squareFootage: 4200,
       price: 250000,
-      image: '/assets/images/plans/mountain-lodge.jpg'
+      image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
     }
   ];
+  
+  // Preload hero image
+  useEffect(() => {
+    const heroImage = new Image();
+    heroImage.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80";
+    heroImage.onload = () => {
+      setLoadedImages(prev => ({ ...prev, hero: true }));
+    };
+    
+    // Preload featured plan images
+    featuredPlans.forEach(plan => {
+      const img = new Image();
+      img.src = plan.image;
+      img.onload = () => {
+        setLoadedImages(prev => ({ ...prev, [plan.id]: true }));
+      };
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <div className="relative h-screen">
         <div className="absolute inset-0 overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-            alt="Modern house exterior" 
-            className="w-full h-full object-cover"
-          />
+          {!loadedImages.hero ? (
+            <div className="w-full h-full bg-gray-200 animate-pulse"></div>
+          ) : (
+            <img 
+              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
+              alt="Modern house exterior" 
+              className="w-full h-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-gray-900/30"></div>
         </div>
         
@@ -81,7 +106,7 @@ const HomePage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by style, size, or features..."
-                className="w-full h-14 px-5 pr-16 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full h-14 px-5 pr-16 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-lg"
               />
               <button 
                 type="submit"
@@ -92,13 +117,13 @@ const HomePage = () => {
             </form>
             
             <div className="mt-6 grid grid-cols-3 gap-4">
-              <Link to="/plans?style=modern" className="bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-lg p-3 text-center transition duration-300">
+              <Link to="/plans?style=modern" className="bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-lg p-3 text-center transition duration-300 shadow-md hover:shadow-lg">
                 Modern
               </Link>
-              <Link to="/plans?style=craftsman" className="bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-lg p-3 text-center transition duration-300">
+              <Link to="/plans?style=craftsman" className="bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-lg p-3 text-center transition duration-300 shadow-md hover:shadow-lg">
                 Craftsman
               </Link>
-              <Link to="/plans?style=farmhouse" className="bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-lg p-3 text-center transition duration-300">
+              <Link to="/plans?style=farmhouse" className="bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-sm rounded-lg p-3 text-center transition duration-300 shadow-md hover:shadow-lg">
                 Farmhouse
               </Link>
             </div>
@@ -121,13 +146,21 @@ const HomePage = () => {
               <Link key={plan.id} to={`/plans/${plan.id}`} className="group">
                 <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300">
                   <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={plan.image} 
-                      alt={plan.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                    />
+                    {!loadedImages[plan.id] ? (
+                      <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <img 
+                        src={plan.image} 
+                        alt={plan.name} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      />
+                    )}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
-                      <div className="text-white font-semibold text-lg">${plan.price}</div>
+                      <div className="text-white font-semibold text-lg">{formatCurrency(plan.price)}</div>
                     </div>
                   </div>
                   <div className="p-4">
@@ -135,7 +168,7 @@ const HomePage = () => {
                     <p className="text-gray-500 mb-2">{plan.style}</p>
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <div>{plan.bedrooms} beds • {plan.bathrooms} baths</div>
-                      <div>{plan.squareFootage} sq ft</div>
+                      <div>{plan.squareFootage.toLocaleString()} sq ft</div>
                     </div>
                   </div>
                 </div>
@@ -156,7 +189,7 @@ const HomePage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
+            <div className="text-center bg-gray-50 p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 text-primary-600 mb-4">
                 <span className="text-2xl font-bold">1</span>
               </div>
@@ -166,7 +199,7 @@ const HomePage = () => {
               </p>
             </div>
             
-            <div className="text-center">
+            <div className="text-center bg-gray-50 p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 text-primary-600 mb-4">
                 <span className="text-2xl font-bold">2</span>
               </div>
@@ -176,7 +209,7 @@ const HomePage = () => {
               </p>
             </div>
             
-            <div className="text-center">
+            <div className="text-center bg-gray-50 p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 text-primary-600 mb-4">
                 <span className="text-2xl font-bold">3</span>
               </div>
@@ -205,7 +238,7 @@ const HomePage = () => {
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
             Our team of architects can create a custom house plan tailored to your specific requirements.
           </p>
-          <Link to="/custom" className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-3 rounded-lg transition duration-300">
+          <Link to="/custom" className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-3 rounded-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
             Request Custom Design
           </Link>
         </div>
