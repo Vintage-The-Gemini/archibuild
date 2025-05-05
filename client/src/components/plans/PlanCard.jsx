@@ -1,11 +1,7 @@
-import React from 'react';
-
-// In the actual implementation, Link would be imported from react-router-dom
-const Link = ({ to, className, children }) => (
-  <a href={to} className={className}>
-    {children}
-  </a>
-);
+// client/src/components/plans/PlanCard.jsx
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { formatCurrency } from '../../utils';
 
 // Simple icons for the features
 const BedIcon = () => (
@@ -50,23 +46,44 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
     bedrooms,
     bathrooms
   } = plan;
+  
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+  
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
       {/* Image container with overlay */}
       <div className="relative">
         <Link to={`/plans/${id}`} className="block relative h-64 overflow-hidden">
+          {/* Image loading placeholder */}
+          {!imageLoaded && !imageError && (
+            <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
+              <div className="w-10 h-10 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin"></div>
+            </div>
+          )}
+          
+          {/* Main image or fallback */}
           <img 
-            src={image || "/api/placeholder/600/400"} 
+            src={imageError ? "/assets/images/placeholder-house.jpg" : (image || "/assets/images/placeholder-house.jpg")} 
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100 hover:scale-105' : 'opacity-0'}`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-70"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
         </Link>
         
         {/* Style tag */}
         <div className="absolute top-4 left-4">
-          <span className="inline-block bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 text-xs font-medium rounded-full">
+          <span className="inline-block bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 text-xs font-medium rounded-full shadow-sm">
             {style}
           </span>
         </div>
@@ -75,9 +92,9 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
         <button 
           className={`absolute top-4 right-4 p-2 rounded-full ${
             isFavorite 
-              ? 'text-red-500 bg-white/90' 
+              ? 'text-red-500 bg-white/90 shadow-md' 
               : 'text-gray-100 bg-black/20 hover:bg-white/90 hover:text-gray-800'
-          } transition-colors`}
+          } transition-all duration-300 transform hover:scale-110`}
           onClick={() => onToggleFavorite && onToggleFavorite(id)}
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
@@ -87,12 +104,12 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
         {/* Price tag */}
         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
           <div className="text-white">
-            <span className="text-lg font-bold">${price.toLocaleString()}</span>
+            <span className="text-lg font-bold">{formatCurrency(price)}</span>
           </div>
           
           <Link 
             to={`/plans/${id}`} 
-            className="bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-4 py-1.5 rounded transition-colors"
+            className="bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-4 py-1.5 rounded transition-all duration-300 transform hover:scale-105 shadow-md"
           >
             View Plan
           </Link>

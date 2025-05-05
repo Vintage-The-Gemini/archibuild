@@ -1,3 +1,4 @@
+// client/src/components/layout/Header.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -61,17 +62,9 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Determine text color based on homepage and scroll state
-  const getTextColor = () => {
-    if (isHomePage) {
-      return isScrolled ? 'text-gray-700' : 'text-white';
-    }
-    return 'text-gray-700';
-  };
-
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${
-      isScrolled || !isHomePage ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
+      isScrolled || !isHomePage ? 'bg-white shadow-md py-2' : 'bg-transparent py-4 backdrop-blur-sm bg-black/10'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
@@ -91,7 +84,13 @@ const Header = () => {
                 key={item.name}
                 to={item.href}
                 className={`text-sm font-medium transition-colors ${
-                  isScrolled || !isHomePage ? 'text-gray-700 hover:text-primary-600' : 'text-white hover:text-gray-200'
+                  location.pathname === item.href
+                    ? isScrolled || !isHomePage
+                      ? 'text-primary-600'
+                      : 'text-white font-bold'
+                    : isScrolled || !isHomePage
+                      ? 'text-gray-700 hover:text-primary-600' 
+                      : 'text-white hover:text-gray-200'
                 }`}
               >
                 {item.name}
@@ -115,10 +114,10 @@ const Header = () => {
             </Link>
             <Link
               to="/login"
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
                 isScrolled || !isHomePage 
-                  ? 'bg-primary-600 text-white hover:bg-primary-700' 
-                  : 'bg-white text-primary-600 hover:bg-gray-100'
+                  ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-md' 
+                  : 'bg-white text-primary-600 hover:bg-gray-100 shadow-lg'
               }`}
             >
               Sign In
@@ -148,7 +147,11 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  location.pathname === item.href
+                    ? 'bg-primary-50 text-primary-600'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
