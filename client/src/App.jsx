@@ -7,14 +7,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 
-// Placeholder Pages (We'll create these later)
-const HomePage = () => <div className="max-w-7xl mx-auto px-4 py-8">Home Page</div>;
-const PlansPage = () => <div className="max-w-7xl mx-auto px-4 py-8">Plans Page</div>;
-const PlanDetailPage = () => <div className="max-w-7xl mx-auto px-4 py-8">Plan Detail Page</div>;
-const LoginPage = () => <div className="max-w-7xl mx-auto px-4 py-8">Login Page</div>;
-const RegisterPage = () => <div className="max-w-7xl mx-auto px-4 py-8">Register Page</div>;
-const CartPage = () => <div className="max-w-7xl mx-auto px-4 py-8">Cart Page</div>;
-const CheckoutPage = () => <div className="max-w-7xl mx-auto px-4 py-8">Checkout Page</div>;
+// Pages
+import HomePage from './pages/HomePage';
+import PlansPage from './pages/PlansPage';
+import PlanDetailPage from './pages/PlanDetailPage';
+const LoginPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">Login Page</div>;
+const RegisterPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">Register Page</div>;
+const CartPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">Cart Page</div>;
+const CheckoutPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">Checkout Page</div>;
+const CustomPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">Custom Design Page</div>;
+const AboutPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">About Us Page</div>;
+const ContactPage = () => <div className="max-w-7xl mx-auto px-4 py-8 pt-24">Contact Page</div>;
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/custom" element={<CustomPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
         <Footer />
