@@ -1,7 +1,9 @@
+// client/src/pages/PlansPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { filterAndSortPlans, PLACEHOLDER_IMAGES } from '../utils';
 
-// Import PlanCard component - in the real implementation, you would import this
+// Import PlanCard component with improved image handling
 import PlanCard from '../components/plans/PlanCard';
 
 // Icons
@@ -14,6 +16,12 @@ const FilterIcon = () => (
 const XMarkIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
   </svg>
 );
 
@@ -42,99 +50,113 @@ const PlansPage = () => {
   // State for sorting
   const [sortBy, setSortBy] = useState('newest');
   
+  // State for loading
+  const [loading, setLoading] = useState(true);
+  
   // Placeholder for plans (would be fetched from API in real implementation)
-  const [plans, setPlans] = useState([
-    {
-      id: 1,
-      name: 'Modern Villa',
-      style: 'Modern',
-      price: 195000,
-      squareFootage: 3200,
-      bedrooms: 4,
-      bathrooms: 3,
-      image: '/assets/images/plans/modern-villa.jpg',
-    },
-    {
-      id: 2,
-      name: 'Coastal Retreat',
-      style: 'Contemporary',
-      price: 165000,
-      squareFootage: 2800,
-      bedrooms: 3,
-      bathrooms: 2.5,
-      image: '/assets/images/plans/coastal-retreat.jpg',
-    },
-    {
-      id: 3,
-      name: 'Mountain Lodge',
-      style: 'Craftsman',
-      price: 250000,
-      squareFootage: 4200,
-      bedrooms: 5,
-      bathrooms: 4,
-      image: '/assets/images/plans/mountain-lodge.jpg',
-    },
-    {
-      id: 4,
-      name: 'Urban Townhouse',
-      style: 'Modern',
-      price: 120000,
-      squareFootage: 1800,
-      bedrooms: 2,
-      bathrooms: 2,
-      image: '/assets/images/plans/urban-townhouse.jpg',
-    },
-    {
-      id: 5,
-      name: 'Country Farmhouse',
-      style: 'Farmhouse',
-      price: 185000,
-      squareFootage: 3600,
-      bedrooms: 4,
-      bathrooms: 3.5,
-      image: '/assets/images/plans/country-farmhouse.jpg',
-    },
-    {
-      id: 6,
-      name: 'Lakefront Cabin',
-      style: 'Craftsman',
-      price: 145000,
-      squareFootage: 2200,
-      bedrooms: 3,
-      bathrooms: 2,
-      image: '/assets/images/plans/lakefront-cabin.jpg',
-    },
-    {
-      id: 7,
-      name: 'Urban Loft Design',
-      style: 'Contemporary',
-      price: 125000,
-      squareFootage: 1900,
-      bedrooms: 2,
-      bathrooms: 2,
-      image: '/assets/images/plans/urban-loft.jpg',
-    },
-    {
-      id: 8,
-      name: 'Mediterranean Villa',
-      style: 'Mediterranean',
-      price: 210000,
-      squareFootage: 3800,
-      bedrooms: 4,
-      bathrooms: 3.5,
-      image: '/assets/images/plans/mediterranean-villa.jpg',
-    },
-    {
-      id: 9,
-      name: 'Desert Oasis',
-      style: 'Modern',
-      price: 175000,
-      squareFootage: 2900,
-      bedrooms: 3,
-      bathrooms: 2.5,
-      image: '/assets/images/plans/desert-oasis.jpg',
-    },
-  ]);
+  const [plans, setPlans] = useState([]);
+  
+  // Fetch plans from API (simulated)
+  useEffect(() => {
+    // Simulate API fetch delay
+    const timer = setTimeout(() => {
+      setPlans([
+        {
+          id: 1,
+          name: 'Modern Villa',
+          style: 'Modern',
+          price: 195000,
+          squareFootage: 3200,
+          bedrooms: 4,
+          bathrooms: 3,
+          image: '/assets/images/plans/modern-villa.jpg',
+        },
+        {
+          id: 2,
+          name: 'Coastal Retreat',
+          style: 'Contemporary',
+          price: 165000,
+          squareFootage: 2800,
+          bedrooms: 3,
+          bathrooms: 2.5,
+          image: '/assets/images/plans/coastal-retreat.jpg',
+        },
+        {
+          id: 3,
+          name: 'Mountain Lodge',
+          style: 'Craftsman',
+          price: 250000,
+          squareFootage: 4200,
+          bedrooms: 5,
+          bathrooms: 4,
+          image: '/assets/images/plans/mountain-lodge.jpg',
+        },
+        {
+          id: 4,
+          name: 'Urban Townhouse',
+          style: 'Modern',
+          price: 120000,
+          squareFootage: 1800,
+          bedrooms: 2,
+          bathrooms: 2,
+          image: '/assets/images/plans/urban-townhouse.jpg',
+        },
+        {
+          id: 5,
+          name: 'Country Farmhouse',
+          style: 'Farmhouse',
+          price: 185000,
+          squareFootage: 3600,
+          bedrooms: 4,
+          bathrooms: 3.5,
+          image: '/assets/images/plans/country-farmhouse.jpg',
+        },
+        {
+          id: 6,
+          name: 'Lakefront Cabin',
+          style: 'Craftsman',
+          price: 145000,
+          squareFootage: 2200,
+          bedrooms: 3,
+          bathrooms: 2,
+          image: '/assets/images/plans/lakefront-cabin.jpg',
+        },
+        {
+          id: 7,
+          name: 'Urban Loft Design',
+          style: 'Contemporary',
+          price: 125000,
+          squareFootage: 1900,
+          bedrooms: 2,
+          bathrooms: 2,
+          image: '/assets/images/plans/urban-loft.jpg',
+        },
+        {
+          id: 8,
+          name: 'Mediterranean Villa',
+          style: 'Mediterranean',
+          price: 210000,
+          squareFootage: 3800,
+          bedrooms: 4,
+          bathrooms: 3.5,
+          image: '/assets/images/plans/mediterranean-villa.jpg',
+        },
+        {
+          id: 9,
+          name: 'Desert Oasis',
+          style: 'Modern',
+          price: 175000,
+          squareFootage: 2900,
+          bedrooms: 3,
+          bathrooms: 2.5,
+          image: '/assets/images/plans/desert-oasis.jpg',
+        },
+      ]);
+      setLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Update URL when filters change
   useEffect(() => {
@@ -178,60 +200,27 @@ const PlansPage = () => {
     });
   };
   
-  // Function to apply filters to plans
-  const filteredPlans = plans.filter(plan => {
-    // Search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      const nameMatches = plan.name.toLowerCase().includes(searchLower);
-      const styleMatches = plan.style.toLowerCase().includes(searchLower);
-      
-      if (!nameMatches && !styleMatches) return false;
-    }
-    
-    // Style filter
-    if (filters.style && plan.style !== filters.style) return false;
-    
-    // Bedrooms filter
-    if (filters.bedrooms && plan.bedrooms < parseInt(filters.bedrooms)) return false;
-    
-    // Bathrooms filter
-    if (filters.bathrooms && plan.bathrooms < parseInt(filters.bathrooms)) return false;
-    
-    // Square footage filters
-    if (filters.minSqFt && plan.squareFootage < parseInt(filters.minSqFt)) return false;
-    if (filters.maxSqFt && plan.squareFootage > parseInt(filters.maxSqFt)) return false;
-    
-    // Price filters
-    if (filters.minPrice && plan.price < parseInt(filters.minPrice)) return false;
-    if (filters.maxPrice && plan.price > parseInt(filters.maxPrice)) return false;
-    
-    return true;
-  });
+  // Handle search input
+  const handleSearchChange = (e) => {
+    setFilters({
+      ...filters,
+      search: e.target.value
+    });
+  };
   
-  // Function to sort plans
-  const sortedPlans = [...filteredPlans].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low-high':
-        return a.price - b.price;
-      case 'price-high-low':
-        return b.price - a.price;
-      case 'sqft-low-high':
-        return a.squareFootage - b.squareFootage;
-      case 'sqft-high-low':
-        return b.squareFootage - a.squareFootage;
-      case 'beds-low-high':
-        return a.bedrooms - b.bedrooms;
-      case 'beds-high-low':
-        return b.bedrooms - a.bedrooms;
-      default:
-        // 'newest' - by ID in this demo (would be by date in a real app)
-        return b.id - a.id;
-    }
-  });
+  // Filter and sort the plans
+  const filteredAndSortedPlans = filterAndSortPlans(plans, filters, sortBy);
   
   // Available styles for filter
   const availableStyles = ['Modern', 'Contemporary', 'Craftsman', 'Farmhouse', 'Colonial', 'Mediterranean'];
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
   
   return (
     <div className="bg-gray-50 min-h-screen pt-20">
@@ -242,6 +231,22 @@ const PlansPage = () => {
           <p className="mt-2 text-gray-600">
             Browse our collection of premium architectural plans crafted by world-class designers.
           </p>
+          
+          {/* Search bar */}
+          <div className="mt-4 relative">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search plans by name, style, or features..."
+                value={filters.search}
+                onChange={handleSearchChange}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <div className="absolute left-3 top-2.5 text-gray-400">
+                <SearchIcon />
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Mobile filter button and sort dropdown */}
@@ -275,7 +280,7 @@ const PlansPage = () => {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Desktop filters sidebar */}
           <div className="hidden md:block w-full md:w-64 flex-shrink-0">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="bg-white p-6 rounded-lg shadow-sm sticky top-24">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-medium text-gray-900">Filters</h2>
                 {Object.values(filters).some(val => val !== '') && (
@@ -413,7 +418,7 @@ const PlansPage = () => {
             {/* Desktop sorting and results count */}
             <div className="hidden md:flex justify-between items-center mb-6">
               <div className="text-gray-500">
-                {filteredPlans.length} {filteredPlans.length === 1 ? 'plan' : 'plans'} found
+                {filteredAndSortedPlans.length} {filteredAndSortedPlans.length === 1 ? 'plan' : 'plans'} found
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-700">Sort by:</span>
@@ -434,9 +439,9 @@ const PlansPage = () => {
             </div>
             
             {/* Plans grid */}
-            {sortedPlans.length > 0 ? (
+            {filteredAndSortedPlans.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedPlans.map(plan => (
+                {filteredAndSortedPlans.map(plan => (
                   <PlanCard
                     key={plan.id}
                     plan={plan}
@@ -446,14 +451,33 @@ const PlansPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
+              <div className="text-center py-12 bg-white rounded-lg shadow-sm">
                 <div className="text-gray-400 text-lg mb-4">No plans match your criteria</div>
                 <button
                   onClick={resetFilters}
-                  className="btn-primary"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
                 >
                   Reset Filters
                 </button>
+              </div>
+            )}
+            
+            {/* Pagination - would be implemented in a real app */}
+            {filteredAndSortedPlans.length > 0 && (
+              <div className="flex justify-center mt-12">
+                <nav className="flex items-center space-x-2">
+                  <button className="px-3 py-1 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                    Previous
+                  </button>
+                  <button className="px-3 py-1 bg-primary-600 text-white rounded-md">1</button>
+                  <button className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">2</button>
+                  <button className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">3</button>
+                  <span className="px-2 text-gray-500">...</span>
+                  <button className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">8</button>
+                  <button className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                    Next
+                  </button>
+                </nav>
               </div>
             )}
           </div>
@@ -612,9 +636,9 @@ const PlansPage = () => {
                 </button>
                 <button
                   onClick={() => setIsFilterOpen(false)}
-                  className="btn-primary"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
                 >
-                  Show results ({filteredPlans.length})
+                  Show results ({filteredAndSortedPlans.length})
                 </button>
               </div>
             </div>

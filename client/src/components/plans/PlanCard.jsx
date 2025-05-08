@@ -1,6 +1,7 @@
 // client/src/components/plans/PlanCard.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 // Simple icons for the features
 const BedIcon = () => (
@@ -34,30 +35,42 @@ const HeartIcon = ({ filled }) => (
   </svg>
 );
 
-/**
- * Format currency to KES with proper formatting
- * @param {number} amount - The amount to format
- * @returns {string} Formatted currency string
- */
-const formatCurrency = (amount) => {
-  return `KES ${amount.toLocaleString()}`;
+// Placeholder images
+const PLACEHOLDER_IMAGES = {
+  PLAN: "/assets/images/plans/placeholder-house.jpg",
+  THUMBNAIL: "/assets/images/plans/placeholder-thumbnail.jpg"
 };
 
 const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
+  // Destructure plan properties with defaults for safety
   const {
     id,
-    name,
-    style,
-    price,
-    image,
-    squareFootage,
-    bedrooms,
-    bathrooms
-  } = plan;
+    name = "Untitled Plan",
+    style = "Unknown",
+    price = 0,
+    image = "",
+    squareFootage = 0,
+    bedrooms = 0,
+    bathrooms = 0
+  } = plan || {};
   
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Get the actual image URL, handling both relative and absolute paths
+  const getImageUrl = () => {
+    if (!image) return PLACEHOLDER_IMAGES.PLAN;
+    
+    // Check if it's an absolute URL (starts with http or https)
+    if (image.startsWith('http')) {
+      return image;
+    }
+    
+    // For relative paths, make sure they're correctly formed
+    // If the image path starts with '/', use it as is, otherwise add '/'
+    return image.startsWith('/') ? image : `/${image}`;
+  };
   
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -65,7 +78,11 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
   
   const handleImageError = () => {
     setImageError(true);
+    console.log(`Image failed to load for plan ${id}: ${image}`);
   };
+
+  // Generate fallback image URL
+  const fallbackImageUrl = PLACEHOLDER_IMAGES.PLAN;
 
   return (
     <div 
@@ -76,7 +93,7 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
       {/* Image container with overlay */}
       <div className="relative">
         <Link to={`/plans/${id}`} className="block relative h-64 overflow-hidden">
-          {/* Image loading placeholder */}
+          {/* Image loading placeholder - shown when image is loading */}
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
               <div className="w-10 h-10 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin"></div>
@@ -85,12 +102,14 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
           
           {/* Main image or fallback */}
           <img 
-            src={imageError ? "/assets/images/placeholder-house.jpg" : (image || "/assets/images/placeholder-house.jpg")} 
-            alt={name}
+            src={imageError ? fallbackImageUrl : getImageUrl()} 
+            alt={`${name} - ${style} House Plan`}
             className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'scale-105' : 'scale-100'}`}
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
+          
+          {/* Image gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
         </Link>
         
@@ -169,13 +188,14 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
               e.stopPropagation();
               // Handle add to cart functionality
               console.log('Adding to cart:', id);
+              // In a real implementation, this would dispatch an action to add to cart
             }}
             className="flex-1 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded transition-colors"
           >
             Add to Cart
           </button>
           <Link 
-            to={`/plans/${id}/customize`} 
+            to={`/plans/${id}`} 
             className="flex-1 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 text-xs font-medium rounded text-center transition-colors"
           >
             Customize

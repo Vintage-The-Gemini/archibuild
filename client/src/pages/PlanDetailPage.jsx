@@ -1,5 +1,8 @@
+// client/src/pages/PlanDetailPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { formatCurrency, getImageUrl, PLACEHOLDER_IMAGES } from '../utils/index';
+import Image from '../components/common/Image';
 
 // Simple icons
 const BedIcon = () => (
@@ -146,11 +149,6 @@ const PlanDetailPage = () => {
     // In a real app, you would save this to user's favorites in your backend
   };
   
-  // Format price with commas
-  const formatPrice = (price) => {
-    return `KES ${price.toLocaleString()}`;
-  };
-  
   if (loading) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -190,14 +188,12 @@ const PlanDetailPage = () => {
           <div>
             {/* Main image */}
             <div className="mb-4 overflow-hidden rounded-lg bg-gray-100 relative">
-              <img 
+              <Image 
                 src={plan.images[activeImage]} 
                 alt={`${plan.name} - View ${activeImage + 1}`}
+                fallbackSrc={PLACEHOLDER_IMAGES.PLAN}
                 className="w-full h-96 object-cover object-center"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/assets/images/plan-placeholder.jpg";
-                }}
+                containerClassName="w-full h-96"
               />
               <button
                 onClick={toggleFavorite}
@@ -222,14 +218,12 @@ const PlanDetailPage = () => {
                     activeImage === index ? 'border-primary-500' : 'border-transparent'
                   }`}
                 >
-                  <img 
+                  <Image 
                     src={image} 
                     alt={`Thumbnail ${index + 1}`}
+                    fallbackSrc={PLACEHOLDER_IMAGES.THUMBNAIL}
                     className="w-full h-16 object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/assets/images/thumbnail-placeholder.jpg";
-                    }}
+                    containerClassName="w-full h-16"
                   />
                 </button>
               ))}
@@ -261,7 +255,7 @@ const PlanDetailPage = () => {
             </div>
             
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-primary-600 mb-2">{formatPrice(plan.price)}</h2>
+              <h2 className="text-2xl font-bold text-primary-600 mb-2">{formatCurrency(plan.price)}</h2>
               <p className="text-gray-600 text-sm">Starting price for Study Set. See packages below.</p>
             </div>
             
@@ -295,14 +289,12 @@ const PlanDetailPage = () => {
             <div className="border-t border-gray-200 pt-6">
               <h3 className="font-medium text-gray-900 mb-2">Designer</h3>
               <div className="flex items-center">
-                <img 
+                <Image 
                   src={plan.designer.image} 
                   alt={plan.designer.name}
+                  fallbackSrc={PLACEHOLDER_IMAGES.DESIGNER}
                   className="w-12 h-12 rounded-full object-cover mr-4"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/assets/images/designer-placeholder.jpg";
-                  }}
+                  containerClassName="w-12 h-12 rounded-full overflow-hidden"
                 />
                 <div>
                   <p className="font-medium">{plan.designer.name}</p>
@@ -427,6 +419,110 @@ const PlanDetailPage = () => {
               </div>
             )}
             
+            {/* Packages Tab */}
+            {activeTab === 'packages' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Available Packages</h2>
+                <p className="text-gray-700 mb-6">Choose the package that best suits your needs:</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {plan.packages.map((pkg, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h3 className="text-lg font-medium text-gray-900">{pkg.name}</h3>
+                      </div>
+                      <div className="p-6">
+                        <p className="text-2xl font-bold text-primary-600 mb-2">{formatCurrency(pkg.price)}</p>
+                        <p className="text-gray-700 mb-4">{pkg.description}</p>
+                        <h4 className="font-medium text-gray-900 mb-2">What's Included:</h4>
+                        <ul className="space-y-2 mb-6">
+                          {pkg.included.map((item, itemIndex) => (
+                            <li key={itemIndex} className="flex items-start">
+                              <div className="flex-shrink-0 h-5 w-5 text-primary-600">
+                                <CheckIcon />
+                              </div>
+                              <span className="ml-2 text-gray-700">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <button className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md font-medium transition-colors">
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Similar Plans Section */}
+        <div className="border-t border-gray-200 pt-12 mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+          
+          {/* Here you would fetch and display similar plans based on the IDs in plan.similarPlans */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Example similar plans with proper image handling */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1">
+              <div className="h-48 overflow-hidden">
+                <Image 
+                  src="/assets/images/plans/similar-plan-1.jpg" 
+                  alt="Similar Plan 1"
+                  fallbackSrc={PLACEHOLDER_IMAGES.PLAN}
+                  className="w-full h-full object-cover"
+                  containerClassName="w-full h-full"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">Modern Craftsman</h3>
+                <p className="text-gray-500 text-sm">3 Beds • 2.5 Baths • 2,400 sq ft</p>
+                <p className="text-primary-600 font-medium mt-2">{formatCurrency(175000)}</p>
+              </div>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1">
+              <div className="h-48 overflow-hidden">
+                <Image 
+                  src="/assets/images/plans/similar-plan-2.jpg" 
+                  alt="Similar Plan 2"
+                  fallbackSrc={PLACEHOLDER_IMAGES.PLAN}
+                  className="w-full h-full object-cover"
+                  containerClassName="w-full h-full"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">Urban Loft</h3>
+                <p className="text-gray-500 text-sm">2 Beds • 2 Baths • 1,800 sq ft</p>
+                <p className="text-primary-600 font-medium mt-2">{formatCurrency(145000)}</p>
+              </div>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1">
+              <div className="h-48 overflow-hidden">
+                <Image 
+                  src="/assets/images/plans/similar-plan-3.jpg" 
+                  alt="Similar Plan 3"
+                  fallbackSrc={PLACEHOLDER_IMAGES.PLAN}
+                  className="w-full h-full object-cover"
+                  containerClassName="w-full h-full"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">Mediterranean Villa</h3>
+                <p className="text-gray-500 text-sm">4 Beds • 3.5 Baths • 3,500 sq ft</p>
+                <p className="text-primary-600 font-medium mt-2">{formatCurrency(225000)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PlanDetailPage;
+            
             {/* Features Tab */}
             {activeTab === 'features' && (
               <div>
@@ -460,14 +556,12 @@ const PlanDetailPage = () => {
                       </div>
                       <div className="p-6">
                         <div className="aspect-w-16 aspect-h-9 mb-6">
-                          <img 
+                          <Image 
                             src={floorPlan.image} 
                             alt={`${plan.name} - ${floorPlan.name} Floor Plan`}
+                            fallbackSrc={PLACEHOLDER_IMAGES.FLOOR_PLAN}
                             className="rounded-lg object-contain w-full"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/assets/images/floorplan-placeholder.jpg";
-                            }}
+                            containerClassName="w-full h-full min-h-[300px]"
                           />
                         </div>
                         <h4 className="font-medium text-gray-900 mb-2">Rooms on this floor:</h4>
@@ -486,77 +580,3 @@ const PlanDetailPage = () => {
               </div>
             )}
             
-            {/* Packages Tab */}
-            {activeTab === 'packages' && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Available Packages</h2>
-                <p className="text-gray-700 mb-6">Choose the package that best suits your needs:</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {plan.packages.map((pkg, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                        <h3 className="text-lg font-medium text-gray-900">{pkg.name}</h3>
-                      </div>
-                      <div className="p-6">
-                        <p className="text-2xl font-bold text-primary-600 mb-2">{formatPrice(pkg.price)}</p>
-                        <p className="text-gray-700 mb-4">{pkg.description}</p>
-                        <h4 className="font-medium text-gray-900 mb-2">What's Included:</h4>
-                        <ul className="space-y-2 mb-6">
-                          {pkg.included.map((item, itemIndex) => (
-                            <li key={itemIndex} className="flex items-start">
-                              <div className="flex-shrink-0 h-5 w-5 text-primary-600">
-                                <CheckIcon />
-                              </div>
-                              <span className="ml-2 text-gray-700">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <button className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md font-medium transition-colors">
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Similar Plans Section */}
-        <div className="border-t border-gray-200 pt-12 mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
-          
-          {/* Here you would fetch and display similar plans based on the IDs in plan.similarPlans */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Placeholder for similar plans */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="h-48 bg-gray-100"></div>
-              <div className="p-4">
-                <h3 className="font-medium">Similar Plan 1</h3>
-                <p className="text-gray-500">Coming Soon</p>
-              </div>
-            </div>
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="h-48 bg-gray-100"></div>
-              <div className="p-4">
-                <h3 className="font-medium">Similar Plan 2</h3>
-                <p className="text-gray-500">Coming Soon</p>
-              </div>
-            </div>
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <div className="h-48 bg-gray-100"></div>
-              <div className="p-4">
-                <h3 className="font-medium">Similar Plan 3</h3>
-                <p className="text-gray-500">Coming Soon</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default PlanDetailPage;

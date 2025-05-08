@@ -127,9 +127,9 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">Contact Us</h3>
             <address className="not-italic text-gray-400 space-y-2">
-              <p>1234 Design Avenue</p>
-              <p>Architectural City, AC 12345</p>
-              <p>United States</p>
+              <p>mandera rd</p>
+              <p>Kileleshwa</p>
+              <p>Kenya</p>
               <p className="mt-4">
                 <a href="mailto:info@archibuild.com" className="hover:text-white transition-colors">
                   info@archibuild.com
@@ -137,7 +137,7 @@ const Footer = () => {
               </p>
               <p>
                 <a href="tel:+12345678900" className="hover:text-white transition-colors">
-                  +1 (234) 567-8900
+                  +254700111333
                 </a>
               </p>
             </address>
