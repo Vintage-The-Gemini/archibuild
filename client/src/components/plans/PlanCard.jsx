@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../utils/formatCurrency';
 
-// Simple icons for the features
+// Icons (same as before)
 const BedIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -35,14 +35,10 @@ const HeartIcon = ({ filled }) => (
   </svg>
 );
 
-// Placeholder images
-const PLACEHOLDER_IMAGES = {
-  PLAN: "/assets/images/plans/placeholder-house.jpg",
-  THUMBNAIL: "/assets/images/plans/placeholder-thumbnail.jpg"
-};
+// Fallback image for when images don't load
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80';
 
 const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
-  // Destructure plan properties with defaults for safety
   const {
     id,
     name = "Untitled Plan",
@@ -58,31 +54,13 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   
-  // Get the actual image URL, handling both relative and absolute paths
-  const getImageUrl = () => {
-    if (!image) return PLACEHOLDER_IMAGES.PLAN;
-    
-    // Check if it's an absolute URL (starts with http or https)
-    if (image.startsWith('http')) {
-      return image;
-    }
-    
-    // For relative paths, make sure they're correctly formed
-    // If the image path starts with '/', use it as is, otherwise add '/'
-    return image.startsWith('/') ? image : `/${image}`;
-  };
-  
   const handleImageLoad = () => {
     setImageLoaded(true);
   };
   
   const handleImageError = () => {
     setImageError(true);
-    console.log(`Image failed to load for plan ${id}: ${image}`);
   };
-
-  // Generate fallback image URL
-  const fallbackImageUrl = PLACEHOLDER_IMAGES.PLAN;
 
   return (
     <div 
@@ -90,26 +68,24 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image container with overlay */}
       <div className="relative">
         <Link to={`/plans/${id}`} className="block relative h-64 overflow-hidden">
-          {/* Image loading placeholder - shown when image is loading */}
+          {/* Loading spinner */}
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
               <div className="w-10 h-10 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin"></div>
             </div>
           )}
           
-          {/* Main image or fallback */}
+          {/* Image */}
           <img 
-            src={imageError ? fallbackImageUrl : getImageUrl()} 
+            src={imageError ? FALLBACK_IMAGE : image} 
             alt={`${name} - ${style} House Plan`}
             className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'scale-105' : 'scale-100'}`}
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
           
-          {/* Image gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
         </Link>
         
@@ -152,7 +128,6 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
         </div>
       </div>
       
-      {/* Content */}
       <div className="p-4">
         <Link to={`/plans/${id}`} className="block">
           <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors mb-1 truncate">
@@ -160,7 +135,6 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
           </h3>
         </Link>
         
-        {/* Features */}
         <div className="flex items-center justify-between text-gray-600 text-sm mt-3">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
@@ -180,15 +154,12 @@ const PlanCard = ({ plan, isFavorite = false, onToggleFavorite }) => {
           </div>
         </div>
         
-        {/* Quick action buttons - visible on hover */}
         <div className={`mt-4 flex space-x-2 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <button 
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              // Handle add to cart functionality
               console.log('Adding to cart:', id);
-              // In a real implementation, this would dispatch an action to add to cart
             }}
             className="flex-1 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded transition-colors"
           >
